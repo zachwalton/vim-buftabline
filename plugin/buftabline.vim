@@ -147,7 +147,15 @@ function! buftabline#render()
 	if len(tabs) | let tabs[0].label = substitute(tabs[0].label, lpad, ' ', '') | endif
 
 	let swallowclicks = '%'.(1 + tabpagenr('$')).'X'
-	return swallowclicks . join(map(tabs,'printf("%%#BufTabLine%s#%s",v:val.hilite,strtrans(v:val.label))'),'') . '%#BufTabLineFill#'
+
+    let projectroot = ctrlspace#roots#CurrentProjectRoot()
+    if empty(projectroot)
+        let project = 'no project'
+    else
+        let project = fnamemodify(projectroot, ":t")
+    end
+
+	return '[' . project . '] ' . swallowclicks . join(map(tabs,'printf("%%#BufTabLine%s#%s",v:val.hilite,strtrans(v:val.label))'),'') . '%#BufTabLineFill#'
 endfunction
 
 function! buftabline#update(deletion)
