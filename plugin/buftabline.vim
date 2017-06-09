@@ -70,6 +70,12 @@ function! buftabline#render()
 		if currentbuf == bufnum | let [centerbuf, s:centerbuf] = [bufnum, bufnum] | endif
 		let bufpath = bufname(bufnum)
 		if strlen(bufpath)
+			" Only display buffers that are active in the current project (CWD)
+			let path = fnamemodify(expand('#'.bufnum.':p'), ":h")
+			if ! (path =~ getcwd())
+				continue
+			endif
+
 			let tab.path = fnamemodify(bufpath, ':p:~:.')
 			let tab.sep = strridx(tab.path, s:dirsep, strlen(tab.path) - 2) " keep trailing dirsep
 			let tab.label = tab.path[tab.sep + 1:]
@@ -155,7 +161,7 @@ function! buftabline#render()
         let project = fnamemodify(projectroot, ":t")
     end
 
-	return '[' . project . '] ' . swallowclicks . join(map(tabs,'printf("%%#BufTabLine%s#%s",v:val.hilite,strtrans(v:val.label))'),'') . '%#BufTabLineFill#'
+	return '[' . project . ']' . swallowclicks . join(map(tabs,'printf("%%#BufTabLine%s#%s",v:val.hilite,strtrans(v:val.label))'),'') . '%#BufTabLineFill#'
 endfunction
 
 function! buftabline#update(deletion)
